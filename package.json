@@ -1,0 +1,20 @@
+{
+  "name": "node-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "node-binance-api": "0.12.5",
+    "node-notifier": "^10.0.0",
+    "technicalindicators": "^3.1.0",
+    "node-telegram-bot-api": "^0.51.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {}
+}
