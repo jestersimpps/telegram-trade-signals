@@ -1,3 +1,4 @@
+import { mtfStochSignal } from "./signals/mtf-signal";
 import { FilterObject } from "./binance.model";
 import { Candle, Ticker } from "./shared/ticker.model";
 import { emaSignal } from "./signals/ema-signal";
@@ -33,7 +34,7 @@ const SYMBOLS = [
   "MANAUSDT",
   "CRVUSDT",
 ];
-const WEBSOCKET_INTERVALS = ["1m", "5m", "15m", "30m", "1h", "4h", "1d"];
+const WEBSOCKET_INTERVALS = ["1m", "3m", "5m", "15m", "30m", "1h", "4h"];
 
 const binance = require("node-binance-api")().options({
   APIKEY: APIKEY,
@@ -132,7 +133,7 @@ export class TickerService {
   private async handleCandlesUpdate(symbol, interval, chart) {
     if (LAST_UPDATE[`${symbol}${interval}`] + 60000 < Date.now()) {
       LAST_UPDATE[`${symbol}${interval}`] = Date.now();
-      let ticker = TICKERS[symbol];
+      let ticker: Ticker = TICKERS[symbol];
       const ohlc = Object.keys(chart).map((time) => ({
         time: +time,
         open: +chart[time].open,
@@ -150,11 +151,13 @@ export class TickerService {
           },
         };
 
-        ticker = { ...ticker, ...partialTicker };
+        ticker = { ...ticker, ...partialTicker, lastAlert: ticker.lastAlert || Date.now() };
 
-        // ADD signals here
-        emaSignal(ohlc, interval, ticker);
-
+        if (ticker.lastAlert > +process.env.ALERT_INTERVAL + Date.now()) {
+          // ADD signals here
+          // emaSignal(ticker);
+          mtfStochSignal(ticker);
+        }
         TICKERS[symbol] = ticker;
       }
     }

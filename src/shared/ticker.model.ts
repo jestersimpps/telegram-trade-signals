@@ -32,13 +32,10 @@ export interface Ticker {
   orderTypes: string[];
   signal: string;
   lastTradePrice: number;
+  lastAlert?: number;
   candles?: {
     [csInterval: string]: Candle[];
   };
-  tradeParams?: {
-    [csInterval: string]: TradeParams;
-  };
-  multiTimeFrameSignals: MtfStoch;
 }
 
 export interface MtfStoch {
@@ -50,11 +47,6 @@ export interface MtfStoch {
   mediumD: number;
   longK: number;
   longD: number;
-}
-export interface TradeParams {
-  signals: SignalDto[];
-  continuationPattern: ContinuationPatternDto;
-  supportAndResistance: { supportPrice: number; resistancePrice: number };
 }
 
 export interface Candle {

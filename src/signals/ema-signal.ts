@@ -1,6 +1,5 @@
 import { sendPrivateTelegramMessage } from "shared/telegram-api";
 import { Candle, Ticker } from "shared/ticker.model";
-const notifier = require("node-notifier");
 
 const EMA = require("technicalindicators").EMA;
 
@@ -8,8 +7,10 @@ const getNthlastElement = (array: number[], last: number) => {
   return array.length > last ? array[array.length - last] : null;
 };
 
-export const emaSignal = (ohlc: Candle[], interval: string, ticker: Ticker) => {
-  if (interval === "4h") {
+export const emaSignal = (ticker: Ticker) => {
+  const ohlc = ticker.candles["t4h"];
+
+  if (ohlc && ohlc.length) {
     const closePrices = ohlc && ohlc.length ? ohlc.map((c) => +c.close) : [];
 
     const ema8 = EMA.calculate({ period: 8, values: closePrices });
@@ -37,9 +38,9 @@ export const emaSignal = (ohlc: Candle[], interval: string, ticker: Ticker) => {
     }
 
     if (ticker.signal != signal) {
-      console.log(ticker.symbol, signal);
-      notifier.notify(`${ticker.symbol} ${interval}: EMA SIGNAL => ${signal}`);
-      // sendPrivateTelegramMessage(process.env.TELEGRAM_CHAT_ID, `${ticker.symbol} ${interval}: ${es.signal}`);
+      const msg = `${ticker.symbol}: EMA SIGNAL => ${signal}`;
+      console.log(msg);
+      if (ticker.signal) sendPrivateTelegramMessage(process.env.TELEGRAM_CHAT_ID, msg);
     }
 
     ticker = { ...ticker, signal: signal };
