@@ -1,8 +1,7 @@
 import { FilterObject } from "./binance.model";
 import { Candle, Ticker } from "./shared/ticker.model";
-import { emaSignal } from "./ema-signal";
+import { emaSignal } from "./signals/ema-signal";
 import { sendPrivateTelegramMessage } from "./shared/telegram-api";
-const notifier = require("node-notifier");
 
 const APIKEY = process.env.APIKEY;
 const APISECRET = process.env.APISECRET;
@@ -34,7 +33,7 @@ const SYMBOLS = [
   "MANAUSDT",
   "CRVUSDT",
 ];
-const WEBSOCKET_INTERVALS = ["1h"];
+const WEBSOCKET_INTERVALS = ["1m", "5m", "15m", "30m", "1h", "4h", "1d"];
 
 const binance = require("node-binance-api")().options({
   APIKEY: APIKEY,
@@ -150,14 +149,11 @@ export class TickerService {
             [`t${interval}`]: ohlc,
           },
         };
-        const es = emaSignal(ohlc, ticker);
-        const profit = (+ohlc[ohlc.length - 1].close * 100) / es.lastTradePrice;
-        ticker = { ...(ticker || {}), ...partialTicker, signal: es.signal } as Ticker;
-        if (TICKERS[symbol].signal != es.signal) {
-          console.log(symbol, es.signal, profit);
-          notifier.notify(`${symbol} ${interval}: ${es.signal}`);
-          sendPrivateTelegramMessage(process.env.TELEGRAM_CHAT_ID, `${symbol} ${interval}: ${es.signal}`);
-        }
+
+        ticker = { ...ticker, ...partialTicker };
+
+        // ADD signals here
+        emaSignal(ohlc, interval, ticker);
 
         TICKERS[symbol] = ticker;
       }
