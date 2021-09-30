@@ -7,6 +7,8 @@ const getNthlastElement = (array: number[], last: number) => {
   return array.length > last ? array[array.length - last] : null;
 };
 
+const SYMBOLS = [];
+
 export const emaSignal = (ticker: Ticker) => {
   const ohlc = ticker.candles["t4h"];
 
@@ -40,9 +42,9 @@ export const emaSignal = (ticker: Ticker) => {
     if (ticker.signal != signal) {
       const msg = `${ticker.symbol}: EMA SIGNAL => ${signal}`;
       console.log(msg);
-      if (ticker.signal) sendPrivateTelegramMessage(process.env.TELEGRAM_CHAT_ID, msg);
+      // if (ticker.signal) sendPrivateTelegramMessage(process.env.TELEGRAM_CHAT_ID, msg);
     }
-
+    SYMBOLS[ticker.symbol] = signal
     ticker = { ...ticker, signal: signal };
   }
 };

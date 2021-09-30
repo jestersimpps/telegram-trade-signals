@@ -1,3 +1,4 @@
+import { mtfStochSignal } from './../signals/mtf-signal';
 export interface Ticker {
   symbol: string;
   priceChange: number;
@@ -32,7 +33,7 @@ export interface Ticker {
   orderTypes: string[];
   signal: string;
   lastTradePrice: number;
-  lastAlert?: number;
+  mtfStochSignal?: number;
   candles?: {
     [csInterval: string]: Candle[];
   };
